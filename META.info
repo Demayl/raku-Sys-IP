@@ -1,0 +1,21 @@
+{
+    "perl"        : "6.*",
+    "name"        : "Sys::IP",
+    "version"     : "0.0.1",
+    "description" : "Get host IP / Interfaces",
+    "tags"        : [ "Sys", "System", "IP", "Host", "Interface", "Iface" ],
+    "license"     : "Artistic-2.0",
+    "provides": {
+        "Sys::IP"         : "lib/Sys/IP.pm6",
+        "Sys::IP::Routes" : "lib/Sys/IP/Routes.pm6",
+        "Sys::IP::RAW"    : "lib/Sys/IP/RAW.pm6",
+    },
+    "authors" : [
+        "Denis Kanchev <denis@demayl.com>"
+    ],
+    "support" : {
+        "bugtracker" : "https://github.com/Demayl/perl6-Sys-IP/issues",
+        "source" : "git://github.com/Demayl/perl6-Sys-IP.git"
+    },
+    "source-url"  : "git://github.com/Demayl/perl6-Sys-IP.git"
+}
