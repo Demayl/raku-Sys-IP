@@ -3,18 +3,18 @@ use NativeCall;
 use Sys::IP::Routes; # get_routes
 
 enum AddrInfo-Family (
-	AF_UNSPEC => 0;
+    AF_UNSPEC => 0;
     AF_PACKET => 17; # Packat family
-	AF_INET => 2;
-	AF_INET6 => 10;
+    AF_INET => 2;
+    AF_INET6 => 10;
 );
 
 enum IFACE_STAT ( # from if.h; man netdevice
-	IFF_UP          => 1 +< 0; # Interface is up
+    IFF_UP          => 1 +< 0; # Interface is up
     IFF_BROADCAST   => 1 +< 1;
-	IFF_LOOPBACK    => 1 +< 3;
+    IFF_LOOPBACK    => 1 +< 3;
     IFF_POINTOPOINT => 1 +< 4;
-	IFF_RUNNING     => 1 +< 6;
+    IFF_RUNNING     => 1 +< 6;
     IFF_MULTICAST   => 1 +< 12;
 );
 
@@ -23,26 +23,26 @@ constant \INET6_ADDRSTRLEN = 46;
 
 
 # struct ifaddrs {
-# 	struct ifaddrs ifa_next; / Next item in list */
-# 	char ifa_name; / Name of interface */
-# 	unsigned int ifa_flags; / Flags from SIOCGIFFLAGS /
-# 	struct sockaddr ifa_addr; / Address of interface */
-# 	struct sockaddr ifa_netmask; / Netmask of interface */
-# 	union {
-# 		struct sockaddr *ifu_broadaddr;
-# 		/ Broadcast address of interface /
-# 		struct sockaddr *ifu_dstaddr;
-# 		/ Point-to-point destination address /
-# 	} ifa_ifu;
-# 	#define ifa_broadaddr ifa_ifu.ifu_broadaddr
-# 	#define ifa_dstaddr ifa_ifu.ifu_dstaddr
-# 	void ifa_data; / Address-specific data */
+#     struct ifaddrs ifa_next; / Next item in list */
+#     char ifa_name; / Name of interface */
+#     unsigned int ifa_flags; / Flags from SIOCGIFFLAGS /
+#     struct sockaddr ifa_addr; / Address of interface */
+#     struct sockaddr ifa_netmask; / Netmask of interface */
+#     union {
+#         struct sockaddr *ifu_broadaddr;
+#         / Broadcast address of interface /
+#         struct sockaddr *ifu_dstaddr;
+#         / Point-to-point destination address /
+#     } ifa_ifu;
+#     #define ifa_broadaddr ifa_ifu.ifu_broadaddr
+#     #define ifa_dstaddr ifa_ifu.ifu_dstaddr
+#     void ifa_data; / Address-specific data */
 # };
 
 
 class SockAddr is repr('CStruct') {
-	has int32 $.sa_family;
-	has CArray[uint8] $.sa_data is rw;
+    has int32 $.sa_family;
+    has CArray[uint8] $.sa_data is rw;
 }
 
 #           struct sockaddr_ll {
@@ -64,9 +64,9 @@ class SockAddrLL is repr('CStruct') {
     has uint8 $.sll_halen;
     has Str $.sll_addr;
 
-	method address { # TODO
-		$!sll_halen;
-	}
+    method address { # TODO
+        $!sll_halen;
+    }
 
 }
 
@@ -76,20 +76,20 @@ sub inet_ntop(int32, Pointer, Blob, int32 --> Str) is native {}
 sub freeifaddrs(Pointer) is native { * };
 sub getifaddrs(Pointer is rw) returns int32 is native { * }
 # When getifaddrs() fails, errno can be set to one of the following:
-# [ENOMEM]	No memory available for the ifaddrs linked list.
-# [ENXIO] 	No interfaces exist.
+# [ENOMEM]    No memory available for the ifaddrs linked list.
+# [ENXIO]     No interfaces exist.
 
 
 class SockAddr-in is repr('CStruct') { # TODO ipv6
-	has int16 $.sin_family;
-	has uint16 $.sin_port;
-	has uint32 $.sin_addr;
+    has int16 $.sin_family;
+    has uint16 $.sin_port;
+    has uint32 $.sin_addr;
 
-	method address {
-		my $buf = buf8.allocate(INET_ADDRSTRLEN);
-		inet_ntop(AF_INET, Pointer.new(nativecast(Pointer,self)+4),
-		$buf, INET_ADDRSTRLEN)
-	}
+    method address {
+        my $buf = buf8.allocate(INET_ADDRSTRLEN);
+        inet_ntop(AF_INET, Pointer.new(nativecast(Pointer,self)+4),
+        $buf, INET_ADDRSTRLEN)
+    }
 }
 
 
@@ -109,11 +109,11 @@ class SockAddr-in6 is repr('CStruct') {
 }
 
 class IfAddrs is repr('CStruct') is export { # TODO test 4 leaks
-	has IfAddrs  $.ifa_next is rw; # referenced
-	has Str      $.ifa_name;
-	has uint     $.ifa_flags;
-	has SockAddr $.ifa_addr is rw;
-	has SockAddr $.ifa_netmask is rw;
+    has IfAddrs  $.ifa_next is rw; # referenced
+    has Str      $.ifa_name;
+    has uint     $.ifa_flags;
+    has SockAddr $.ifa_addr is rw;
+    has SockAddr $.ifa_netmask is rw;
     has SockAddr $.ifa_ifu is rw; # CUnion, but has 2 same type-size structs
     has Pointer  $.ifa_data is rw;
 }
@@ -121,14 +121,14 @@ class IfAddrs is repr('CStruct') is export { # TODO test 4 leaks
 
 multi sub get_interfaces('linux', :$ipv6, :$loopback, :$active, :$ip --> Array) is export {
 
-	my Pointer $data .= new;
-	my int32 $status = getifaddrs($data);
+    my Pointer $data .= new;
+    my int32 $status = getifaddrs($data);
 
-	if $status == -1 { # TODO throw Exception
-		return Nil;
-	}
+    if $status == -1 { # TODO throw Exception
+        return Nil;
+    }
 
-	my $ifaces = nativecast(IfAddrs, $data);
+    my $ifaces = nativecast(IfAddrs, $data);
     my @data;
     my %iface-info;
     my %routes = get_routes.grep({$_}).grep(*<Gateway> ne '00000000').map({ $_<Iface> => $_ });
