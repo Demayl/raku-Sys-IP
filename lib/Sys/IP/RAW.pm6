@@ -131,7 +131,10 @@ multi sub get_interfaces('linux', :$ipv6, :$loopback, :$active, :$ip --> Array) 
     my $ifaces = nativecast(IfAddrs, $data);
     my @data;
     my %iface-info;
-    my %routes = get_routes.grep({$_}).grep(*<Gateway> ne '00000000').map({ $_<Iface> => $_ });
+    my %routes = (
+        4 => get_routes.grep({$_}).grep(*<Gateway> ne '0.0.0.0').map({ $_<Iface> => $_ }).Hash,
+        6 => get_routes(:ipv6).grep({$_}).grep(*<Gateway> ne ':').map({ $_<Iface> => $_ }).Hash
+    );
 
     CATCH {
         when X::Sys::IP::Routes::NotSupported { # default route is not implemented
@@ -143,7 +146,7 @@ multi sub get_interfaces('linux', :$ipv6, :$loopback, :$active, :$ip --> Array) 
         NEXT $ifaces = $if.ifa_next; # move iterator
 
         # If is up and running, only IP interfaces
-        if (($active and $if.ifa_flags +& (IFF_UP +| IFF_RUNNING)) || !$active) and $if.ifa_addr.sa_family +& AF_INET +| AF_INET6 {
+        if (($active and $if.ifa_flags +& (IFF_UP +| IFF_RUNNING)) || !$active) and $if.ifa_addr.sa_family == AF_INET | AF_INET6 {
 
             next if !$loopback && $if.ifa_flags +& IFF_LOOPBACK; # Ignore loopback
 
@@ -172,16 +175,17 @@ multi sub get_interfaces('linux', :$ipv6, :$loopback, :$active, :$ip --> Array) 
                 }
                 default { note "Unknown flags"; next }
             }
+            my Int $ip-ver = ($if.ifa_addr.sa_family == AF_INET) ?? 4 !! 6;
             @data.push( %(
-                name => $if.ifa_name,
-                ip-addr => $ip,
-                mask => $mask,
-                broadcast => $bcast,
-                ptp-dest => $ptp,
-                multicast => ($if.ifa_addr.sa_family +& IFF_MULTICAST).Bool,
-                loopback => ($if.ifa_flags +& IFF_LOOPBACK).Bool,
-                gw-ip    => %routes{$if.ifa_name}<Gateway> ?? decode_ip( %routes{$if.ifa_name}<Gateway> ) !! Nil,
-                iface-flags => $if.ifa_flags
+                name        => $if.ifa_name,
+                ip-addr     => $ip    // '',
+                mask        => $mask  // '',
+                broadcast   => $bcast // '',
+                ptp-dest    => $ptp   // '',
+                multicast   => ($if.ifa_addr.sa_family +& IFF_MULTICAST).Bool,
+                loopback    => ($if.ifa_flags +& IFF_LOOPBACK).Bool,
+                gw-ip       => get_route( $ip-ver, $if.ifa_name, %routes ) // '',
+                iface-flags => $if.ifa_flags.Int
             ) );
         } else {
 #            say $if.ifa_flags;
@@ -192,6 +196,10 @@ multi sub get_interfaces('linux', :$ipv6, :$loopback, :$active, :$ip --> Array) 
     return @data
 }
 
-sub decode_ip( Str $hex-ip --> Str ) {
-    $hex-ip.comb(2).reverse.map(*.parse-base(16)).join(".")
+sub get_route( Int $ip-version, Str $iface, %routes --> Str ){
+
+    if %routes{$ip-version}{$iface}<Gateway> && %routes{$ip-version}{$iface}<Gateway>.chars > 5 {
+        return %routes{$ip-version}{$iface}<Gateway>,
+    }
+    Nil
 }

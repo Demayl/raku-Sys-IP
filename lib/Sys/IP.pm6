@@ -18,15 +18,14 @@ method get_interfaces returns Array {
 
 method get_ips returns Array {
 
-    return Nil if $!ip; # IP not needed
+    return Nil if !$!ip; # IP not needed
 
     my @ips = self.get_interfaces();
     @ips.grep(*<ip-addr>).map(*<ip-addr>).Array;
 }
 
 method get_default_ip returns Str {
-    return Nil if $!ip; # IP not needed
-
+    return Nil if !$!ip; # IP not needed
     my $iface = get_default_iface();
     self.get_interfaces().grep( *<name> eq $iface ).map(*<ip-addr>).first;
 }
