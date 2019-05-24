@@ -11,6 +11,12 @@ Get system IP addresses and interfaces.
 It doesn't rely on ifconfig/ipconfig etc. It does this by using routing table default route and C ABI.
 All method works fine on Linux only ( for now ). BSD is the next target.
 
+## Coming soon
+BSD, Windows
+
+## Why not ifconfig / ipconfig
+Really ?
+
 ## Example
 
 ```perl6
