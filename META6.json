@@ -8,7 +8,7 @@
     "provides": {
         "Sys::IP"         : "lib/Sys/IP.pm6",
         "Sys::IP::Routes" : "lib/Sys/IP/Routes.pm6",
-        "Sys::IP::RAW"    : "lib/Sys/IP/RAW.pm6",
+        "Sys::IP::RAW"    : "lib/Sys/IP/RAW.pm6"
     },
     "authors" : [
         "Denis Kanchev <denis@demayl.com>"
