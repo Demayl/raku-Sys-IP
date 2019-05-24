@@ -12,8 +12,8 @@ class X::Sys::IP::Routes::NotSupported is X::Sys::IP::Routes {
     method message { $!msg }
 }
 
-sub get_default_iface is export { # TODO get ipv6
-    _default_route_iface( $*VM.osname ); 
+sub get_default_iface( Bool :$ipv6 ) is export { # TODO get ipv6
+    _default_route_iface( $*VM.osname, $ipv6 ?? 'ipv6' !! 'ipv4' ); 
 }
 
 sub get_routes(Bool :$ipv6) is export {
@@ -53,9 +53,9 @@ multi sub _get_routes('linux', 'ipv6' --> Array ) is hidden-from-backtrace { # T
             SourcePrefix        => @vals[3],
             Gateway             => @vals[4].&decode_ipv6,
             Metric              => @vals[5].parse-base(16),
-            RefCount            => @vals[6],
+            RefCount            => @vals[6].parse-base(16),
             UseCount            => @vals[7].parse-base(16),
-            Flags               => @vals[8],
+            Flags               => @vals[8].parse-base(16),
             Iface               => @vals[9]
         ));
     }
@@ -63,10 +63,15 @@ multi sub _get_routes('linux', 'ipv6' --> Array ) is hidden-from-backtrace { # T
 }
 
 
-multi sub _default_route_iface('linux' --> Str ) is hidden-from-backtrace { # TODO get info from the kernel ?
+multi sub _default_route_iface('linux', 'ipv4' --> Str ) is hidden-from-backtrace { # TODO get info from the kernel ?
     my @routes = _get_routes('linux', 'ipv4');
     @routes.grep( *<Destination> eq '0.0.0.0' && *<Mask> eq '0.0.0.0' && *<Flags>.Int +& 0x0003 ).map( *<Iface> ).first; # Route Default GW and usable
 }
+multi sub _default_route_iface('linux', 'ipv6' --> Str ) is hidden-from-backtrace { # TODO get info from the kernel ?
+    my @routes = _get_routes('linux', 'ipv6');
+    @routes.grep( *<Flags>.Int +& 0x0003 == 3 ).map( *<Iface> ).first; # Route Default GW and usable
+}
+
 
 multi sub _default_route_iface('windows' --> Str) is hidden-from-backtrace { # TODO
 

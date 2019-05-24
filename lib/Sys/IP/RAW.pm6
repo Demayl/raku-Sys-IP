@@ -179,6 +179,7 @@ multi sub get_interfaces('linux', :$ipv6, :$loopback, :$active, :$ip --> Array) 
             @data.push( %(
                 name        => $if.ifa_name,
                 ip-addr     => $ip    // '',
+                ip-version  => $ip-ver,
                 mask        => $mask  // '',
                 broadcast   => $bcast // '',
                 ptp-dest    => $ptp   // '',

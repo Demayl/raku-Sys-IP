@@ -26,6 +26,7 @@ method get_ips returns Array {
 
 method get_default_ip returns Str {
     return Nil if !$!ip; # IP not needed
-    my $iface = get_default_iface();
-    self.get_interfaces().grep( *<name> eq $iface ).map(*<ip-addr>).first;
+
+    my $iface = get_default_iface(:$!ipv6);
+    self.get_interfaces().grep( *<name> eq $iface && *<ip-version> == ( $!ipv6 ?? 6 !! 4 ) ).map(*<ip-addr>).first;
 }
