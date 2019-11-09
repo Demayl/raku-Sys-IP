@@ -14,8 +14,8 @@
         "Denis Kanchev <denis@demayl.com>"
     ],
     "support" : {
-        "bugtracker" : "https://github.com/Demayl/perl6-Sys-IP/issues",
-        "source" : "git://github.com/Demayl/perl6-Sys-IP.git"
+        "bugtracker" : "https://github.com/Demayl/raku-Sys-IP/issues",
+        "source" : "git://github.com/Demayl/raku-Sys-IP.git"
     },
-    "source-url"  : "git://github.com/Demayl/perl6-Sys-IP.git"
+    "source-url"  : "git://github.com/Demayl/raku-Sys-IP.git"
 }

@@ -1,8 +1,8 @@
-# perl6-Sys-IP
+# raku Sys::IP
 
-[![Build Status](https://travis-ci.org/demayl/perl6-Sys-IP.svg?branch=master)](https://travis-ci.org/demayl/perl6-Sys-IP)
+[![Build Status](https://travis-ci.org/demayl/raku-Sys-IP.svg?branch=master)](https://travis-ci.org/demayl/raku-Sys-IP)
 
-Get system IP / Interfaces
+Get system IP / Interfaces with Raku programming language
 
 ## VERSION
 WIP
