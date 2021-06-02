@@ -5,11 +5,11 @@
 Get system IP / Interfaces with Raku programming language
 
 ## VERSION
-WIP
+0.1.0
 
 ## DESCRIPTION
 
-Get system IP addresses and interfaces.
+Get system IP/DNS/Gateway addresses and interfaces.
 It doesn't rely on ifconfig/ipconfig etc. It does this by using routing table default route and C ABI.
 All method works fine on Linux only ( for now ). BSD is the next target.
 
@@ -32,6 +32,9 @@ say Sys::IP.new.get_ips(); # [ 192.168.0.1, 192.168.0.2 ]
 
 # Get all active interfaces
 say Sys::IP.new.get_interfaces(); # [ { name => eth0, ip-addr => 192.168.0.1 }, ...]
+
+# Get all DNS addresses
+say Sys::IP.new.get_dns_ips(); # [ 127.0.0.23, 8.8.8.8 ]
 ```
 
 ## Constructor
