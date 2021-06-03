@@ -1,5 +1,5 @@
 #!/usr/bin/env perl6
-unit class Sys::IP:ver<0.0.1>:auth<github:demayl>;
+unit class Sys::IP:ver<0.1.0>:auth<github:demayl>;
 use Sys::IP::RAW; # get_interfaces
 use Sys::IP::Routes; # default_iface
 use Sys::IP::DNS; # get_dns_list
