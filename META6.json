@@ -12,8 +12,9 @@
         "Sys::IP::DNS"    : "lib/Sys/IP/DNS.rakumod"
 
     },
+    "auth" : "zef:demayl",
     "authors" : [
-        "Denis Kanchev <denis@demayl.com>"
+        "Denis Kanchev <denis@fluxark.com>"
     ],
     "support" : {
         "bugtracker" : "https://github.com/Demayl/raku-Sys-IP/issues",
